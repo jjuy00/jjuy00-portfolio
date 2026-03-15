@@ -3,7 +3,7 @@
 .about-section { }
 .about-body {
   font-size: 1.05rem;
-  color: #5a5a7a;
+  color: #749BC2;
   line-height: 1.8;
   max-width: 600px;
 }
@@ -18,7 +18,7 @@
 
 .project-card {
   background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(99, 103, 255, 0.15);
+  border: 1px solid rgba(70, 130, 169, 0.15);
   border-radius: 16px;
   padding: 1.75rem;
   backdrop-filter: blur(8px);
@@ -27,19 +27,19 @@
 
 .project-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(99, 103, 255, 0.12);
+  box-shadow: 0 12px 32px rgba(70, 130, 169, 0.12);
 }
 
 .card-title {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #1a1a3a;
+  color: #4682A9;
   margin-bottom: 0.5rem;
 }
 
 .card-desc {
   font-size: 0.9rem;
-  color: #6a6a8a;
+  color: #749BC2;
   line-height: 1.6;
   margin-bottom: 1rem;
 }
@@ -55,9 +55,9 @@
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(99, 103, 255, 0.1);
+  background: rgba(70, 130, 169, 0.1);
   color: var(--accent);
-  border: 1px solid rgba(99, 103, 255, 0.2);
+  border: 1px solid rgba(70, 130, 169, 0.2);
 }
 
 /* Contact */
@@ -73,7 +73,7 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 1rem;
-  color: #3a3a5c;
+  color: #4682A9;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;

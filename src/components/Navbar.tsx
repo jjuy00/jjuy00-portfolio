@@ -1,5 +1,6 @@
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import "./Navbar.css";
+import logoUrl from "/public/logo.svg";
 
 export default function Navbar() {
   const scrollTo = (id: string) => {
@@ -12,7 +13,7 @@ export default function Navbar() {
       <div className="navbar-inner">
         {/* 로고 */}
         <a className="navbar-logo" href="#top" onClick={(e) => { e.preventDefault(); scrollTo("top"); }}>
-          <img src="/logo.svg" alt="logo" className="navbar-logo-img" />
+          <img src={logoUrl} alt="logo" className="navbar-logo-img" />
         </a>
 
         {/* Radix NavigationMenu */}
