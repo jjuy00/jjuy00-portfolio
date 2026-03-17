@@ -4,8 +4,11 @@
 .about-body {
   font-size: 1.05rem;
   color: #749BC2;
-  line-height: 1.8;
-  max-width: 600px;
+  line-height: 1.9;
+  max-width: 640px;
+
+  margin: 0 auto;      /* 가운데 위치 */
+  text-align: center;  /* 텍스트 중앙 */
 }
 
 /* Projects */
@@ -85,4 +88,31 @@
 
 .contact-icon {
   font-size: 1.2rem;
+}
+
+/* ─ About Tags ─ */
+.about-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.about-tag {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4682A9;
+
+  background: rgba(70,130,169,0.08);
+  border: 1px solid rgba(70,130,169,0.18);
+
+  transition: transform 0.2s, background 0.2s;
+}
+
+.about-tag:hover {
+  transform: translateY(-2px);
+  background: rgba(70,130,169,0.15);
 }

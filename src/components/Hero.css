@@ -74,70 +74,111 @@
   transform: translateY(0);
 }
 
-/* ─ Orbit side ─ */
-.hero-orbit {
+/* ─ Stack board side ─ */
+.hero-stack-board {
   flex: 1;
-  position: relative;
-  max-width: 420px;
-  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stack-board {
+  width: min(460px, 100%);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(70, 130, 169, 0.14);
+  border-radius: 28px;
+  padding: 1.4rem;
+  box-shadow: 0 22px 50px rgba(70, 130, 169, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.stack-board-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
 }
 
-.orbit-center {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
-  box-shadow: 0 0 40px rgba(70, 130, 169, 0.4);
-  z-index: 2;
+.stack-board-header p {
+  margin: 0 0 0 0.4rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #4b6e88;
 }
 
-.orbit-ring {
-  position: absolute;
+.dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border: 1px dashed rgba(70, 130, 169, 0.25);
+}
+
+.dot.pink { background: #ff9fb1; }
+.dot.yellow { background: #ffd76a; }
+.dot.blue { background: #8cc8ff; }
+
+.stack-grid {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.stack-badge {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  animation: spinRing linear infinite;
-}
-
-.orbit-ring-1 { width: 180px; height: 180px; animation-duration: 10s; }
-.orbit-ring-2 { width: 280px; height: 280px; animation-duration: 16s; animation-direction: reverse; }
-.orbit-ring-3 { width: 370px; height: 370px; animation-duration: 22s; }
-
-@keyframes spinRing {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.orbit-pill {
-  position: relative;
-  top: -14px;
-  padding: 0.35rem 1rem;
+  padding: 0.72rem 1rem;
   border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  /* counter-rotate so text stays upright */
-  animation: counterSpin linear infinite;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid rgba(70, 130, 169, 0.14);
+  box-shadow: 0 8px 18px rgba(70, 130, 169, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.orbit-ring-1 .orbit-pill { animation-duration: 10s; }
-.orbit-ring-2 .orbit-pill { animation-duration: 16s; animation-direction: reverse; }
-.orbit-ring-3 .orbit-pill { animation-duration: 22s; }
-
-@keyframes counterSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(-360deg); }
+.stack-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(70, 130, 169, 0.14);
 }
 
-.orbit-1 { background: rgba(70, 130, 169, 0.12); color: var(--accent);     border: 1px solid rgba(70,130,169,0.3); }
-.orbit-2 { background: rgba(116, 155, 194, 0.12); color: var(--accent-mid); border: 1px solid rgba(116,155,194,0.3); }
-.orbit-3 { background: rgba(145, 200, 228, 0.15); color: #4682A9;           border: 1px solid rgba(145,200,228,0.4); }
+.stack-react {
+  background: #eef8ff;
+  color: #4682a9;
+}
+
+.stack-ts {
+  background: #edf4ff;
+  color: #356b97;
+}
+
+.stack-js {
+  background: #fff8dc;
+  color: #8a6a00;
+}
+
+.stack-tailwind {
+  background: #e9fbff;
+  color: #1597b2;
+}
+
+.stack-zustand {
+  background: #f4f2ff;
+  color: #6558b3;
+}
+
+.stack-git {
+  background: #fff1eb;
+  color: #c96a45;
+}
+
+.stack-figma {
+  background: #fff0f6;
+  color: #c05c87;
+}
+
+.stack-map {
+  background: #edf9f1;
+  color: #4f8b67;
+}
 
 /* ─ Responsive ─ */
 @media (max-width: 768px) {
@@ -146,10 +187,15 @@
     text-align: center;
     padding: 7rem 0 3rem;
   }
+
   .hero-text { max-width: 100%; }
   .desc { margin-left: auto; margin-right: auto; }
-  .hero-orbit { max-width: 300px; width: 300px; }
-  .orbit-ring-1 { width: 140px; height: 140px; }
-  .orbit-ring-2 { width: 220px; height: 220px; }
-  .orbit-ring-3 { width: 290px; height: 290px; }
+
+  .hero-stack-board {
+    width: 100%;
+  }
+
+  .stack-grid {
+    justify-content: center;
+  }
 }
