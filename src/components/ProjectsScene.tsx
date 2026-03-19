@@ -1,54 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { PROJECTS } from "./ProjectTypes";
+import ProjectModal from "./ProjectModal";
+import ProjectCard from "./ProjectCard";
 import "./ProjectsScene.css";
 
-interface Project {
-  id: string;
-  title: string;
-  shortDesc: string;
-  fullDesc: string;
-  tags: string[];
-  link?: string;
-  rx: number;
-}
-
-const PROJECTS: Project[] = [
-  {
-    id: "p1",
-    title: "Portfolio v1",
-    shortDesc: "개인 포트폴리오 사이트",
-    fullDesc:
-      "React + TypeScript + Vite로 제작한 개인 포트폴리오 웹사이트입니다. 컴포넌트 분리, Canvas 애니메이션, Radix UI 등을 활용했습니다.",
-    tags: ["React", "TypeScript", "Vite", "Radix UI"],
-    link: "https://github.com/jjuy00",
-    rx: 0.18,
-  },
-  {
-    id: "p2",
-    title: "Coming Soon",
-    shortDesc: "준비 중인 프로젝트",
-    fullDesc: "곧 추가될 프로젝트입니다. 기대해주세요!",
-    tags: [],
-    rx: 0.4,
-  },
-  {
-    id: "p3",
-    title: "Coming Soon",
-    shortDesc: "준비 중인 프로젝트",
-    fullDesc: "곧 추가될 프로젝트입니다. 기대해주세요!",
-    tags: [],
-    rx: 0.63,
-  },
-  {
-    id: "p4",
-    title: "Coming Soon",
-    shortDesc: "준비 중인 프로젝트",
-    fullDesc: "곧 추가될 프로젝트입니다. 기대해주세요!",
-    tags: [],
-    rx: 0.84,
-  },
-];
-
-const S = 4;
+const S = 4;          // 픽셀 크기 (고양이 한 칸)
+const CAT_PX = 19;    // 고양이 가로 칸 수
+const CAT_PY = 18;    // 고양이 세로 칸 수
 const CARD_RADIUS = 88;
 
 // 산 능선 높이 계산
@@ -60,107 +18,96 @@ function getMountainY(x: number, _w: number, h: number) {
   );
 }
 
-// ── 픽셀 치즈냥 ──
+// ── 정면 치즈냥 (레퍼런스 사진 스타일) ──
+// ox, oy = 고양이 좌상단 기준점
+// facingLeft: 왼쪽 이동 시 좌우 반전
 function drawPixelCat(
   ctx: CanvasRenderingContext2D,
   ox: number,
   oy: number,
   frame: number,
-  walking: boolean,
+  _walking: boolean,
   facingLeft: boolean
 ) {
-  const bob = walking ? Math.floor(Math.sin(frame * 0.22)) * S : 0;
+  // 걸을 때 위아래 bob
+  const bob = _walking ? Math.round(Math.sin(frame * 0.22) * 0.8) * S : 0;
+  const O = oy + bob;
+
   ctx.save();
   if (!facingLeft) {
-    ctx.translate(ox * 2 + 13 * S, 0);
+    const catW = CAT_PX * S;
+    ctx.translate(ox * 2 + catW, 0);
     ctx.scale(-1, 1);
   }
 
-  const p = (x: number, y: number, col: string) => {
-    ctx.fillStyle = col;
-    ctx.fillRect(ox + x * S, oy + y * S + bob, S, S);
+  // 치즈냥 팔레트
+  const Y1 = "#fcc93f"; // 밝은 노랑 (몸)
+  const Y2 = "#da9525"; // 중간 음영
+  const Y3 = "#a26a16"; // 어두운 줄무늬/발
+  const WH = "#FFF8DC"; // 흰 턱/배
+  const BK = "#1A1208"; // 검정 눈/코/입
+  const PK = "#FFB3CC"; // 귀 안쪽
+
+  const r = (x: number, y: number, w: number, h: number, c: string) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(ox + x * S, O + y * S, w * S, h * S);
   };
 
-  const Y = "#F5D07A",
-    D = "#D4972A",
-    K = "#1e1840",
-    P = "#ff99bb",
-    W = "#ffffff",
-    G = "#bbbbbb";
+  // ── 꼬리: 오른쪽 옆에서 살랑살랑 ──
+  const ts = Math.round(Math.sin(frame * 0.07) * 2.0);
+  r(14, 8 + ts,  2, 1, Y2);   // 꼬리 뿌리
+  r(15, 6 + ts,  2, 2, Y1);   // 꼬리 중단
+  r(16, 4 + ts,  2, 2, Y1);   // 꼬리 상단
+  r(15, 3 + ts,  2, 1, WH);   // 꼬리 끝
 
-  p(1, 0, D);
-  p(2, 0, D);
-  p(8, 0, D);
-  p(9, 0, D);
-  p(1, 1, Y);
-  p(2, 1, Y);
-  p(8, 1, Y);
-  p(9, 1, Y);
-  for (let x = 0; x <= 11; x++) {
-    p(x, 2, Y);
-    p(x, 3, Y);
-  }
+  // ── 몸통 ──
+  r(3, 10, 11, 6, Y1);         // 몸 전체
+  r(4, 14, 9,  2, Y2);         // 아래 음영
+  r(4.5, 11, 8,  3, WH);         // 배 흰색
 
-  const blink = !walking && Math.floor(frame / 70) % 5 === 0 && frame % 70 < 6;
-  for (let x = 0; x <= 11; x++) p(x, 4, Y);
-  if (blink) {
-    p(2, 4, D);
-    p(3, 4, D);
-    p(7, 4, D);
-    p(8, 4, D);
-  } else {
-    p(2, 4, K);
-    p(3, 4, K);
-    p(7, 4, K);
-    p(8, 4, K);
-    p(3, 3, W);
-    p(8, 3, W);
-  }
 
-  for (let x = 0; x <= 11; x++) p(x, 5, Y);
-  p(5, 5, P);
-  p(6, 5, P);
-  for (let x = 0; x <= 11; x++) p(x, 6, Y);
-  p(4, 6, D);
-  p(5, 6, D);
-  p(6, 6, D);
-  p(7, 6, D);
-  p(0, 4, G);
-  p(0, 5, G);
-  p(11, 4, G);
-  p(11, 5, G);
+  // ── 다리/발 4개 ──
+  r(3,  15, 2, 2, Y1); r(3,  16, 2, 1, Y3);  // 왼앞
+  r(6,  15, 2, 2, Y1); r(6,  16, 2, 1, Y3);  // 가운데왼
+  r(9,  15, 2, 2, Y1); r(9,  16, 2, 1, Y3);  // 가운데오
+  r(12, 15, 2, 2, Y1); r(12, 16, 2, 1, Y3);  // 오른앞
 
-  for (let x = 1; x <= 10; x++) p(x, 7, Y);
-  for (let x = 0; x <= 11; x++) p(x, 8, Y);
-  p(2, 8, D);
-  p(3, 8, D);
-  p(7, 8, D);
-  p(8, 8, D);
-  for (let x = 0; x <= 11; x++) p(x, 9, Y);
 
-  const tailSw = Math.floor(Math.sin(frame * 0.07) * 1.5);
-  p(11, 8, Y);
-  p(12, 7, Y);
-  p(13, 6 + tailSw, D);
-  p(13, 5 + tailSw, D);
-  p(12, 4 + tailSw, Y);
+  // ── 머리 ──
+  r(3,  2, 11, 8, Y1);   // 머리 덩어리
+  r(4,  1,  9, 1, Y1);   // 위 라운드
+  r(2,  3, 13, 7, Y1);   // 옆 풍성
+  // 흰 턱
+  r(5,  7,  7, 3, WH);
 
-  const legL = Math.sin(frame * 0.22) > 0;
-  p(2, 10, Y);
-  p(3, 10, Y);
-  p(8, 10, Y);
-  p(9, 10, Y);
-  if (walking) {
-    p(2, 11, legL ? D : Y);
-    p(3, 11, legL ? Y : D);
-    p(8, 11, legL ? Y : D);
-    p(9, 11, legL ? D : Y);
-  } else {
-    p(2, 11, Y);
-    p(3, 11, Y);
-    p(8, 11, Y);
-    p(9, 11, Y);
-  }
+  // 귀 (뾰족)
+  r(3,  0, 2, 3, Y1); r(4,  0, 1, 2, Y2); r(3,  1, 1, 1, PK); // 왼쪽 귀
+  r(12, 0, 2, 3, Y1); r(12, 0, 1, 2, Y2); r(13, 1, 1, 1, PK); // 오른쪽 귀
+
+  // 이마 줄무늬 3개
+  r(6,  1, 1, 3, Y3);
+  r(8,  1, 1, 3, Y3);
+  r(10, 1, 1, 3, Y3);
+
+  // ── 눈: 세로 일자 2개 ──
+  r(5,  6, 2, 3, BK);   // 왼눈
+  r(10, 6, 2, 3, BK);   // 오른눈
+  // 하이라이트
+  r(5,  6, 1, 1, WH);
+  r(10, 6, 1, 1, WH);
+
+  // ── 코 ──
+  r(8, 9, 1, 1, Y3);
+
+
+  // ── 수염: 코 양옆으로 ──
+  ctx.fillStyle = Y2;
+  // 왼쪽 수염 2줄
+  ctx.fillRect(ox + 2 * S, O + 8 * S + 2, 3 * S, 2);
+  ctx.fillRect(ox + 2 * S, O + 8 * S + 7, 3 * S, 2);
+  // 오른쪽 수염 2줄
+  ctx.fillRect(ox + 11.5 * S + 2, O + 8 * S + 2, 3 * S, 2);
+  ctx.fillRect(ox + 11.5 * S + 2, O + 8 * S + 7, 3 * S, 2);
 
   ctx.restore();
 }
@@ -172,7 +119,6 @@ function drawBackground(
   h: number,
   frame: number
 ) {
-  // 하늘
   const sky = ctx.createLinearGradient(0, 0, 0, h);
   sky.addColorStop(0, "#bfe8ff");
   sky.addColorStop(0.55, "#e7f7ff");
@@ -192,7 +138,6 @@ function drawBackground(
     { x: w * 0.48 + Math.sin(frame * 0.008 + 2) * 8, y: h * 0.2, s: 0.9 },
     { x: w * 0.72 + Math.sin(frame * 0.009 + 1) * 5, y: h * 0.12, s: 1.2 },
   ];
-
   clouds.forEach(({ x, y, s }) => {
     ctx.fillStyle = "rgba(255,255,255,0.88)";
     ctx.beginPath();
@@ -208,12 +153,7 @@ function drawBackground(
   ctx.beginPath();
   ctx.moveTo(0, h);
   for (let xi = 0; xi <= w; xi += 6) {
-    ctx.lineTo(
-      xi,
-      h * 0.42 -
-        Math.sin(xi * 0.006 + 1.2) * 28 -
-        Math.sin(xi * 0.018 + 0.5) * 16
-    );
+    ctx.lineTo(xi, h * 0.42 - Math.sin(xi * 0.006 + 1.2) * 28 - Math.sin(xi * 0.018 + 0.5) * 16);
   }
   ctx.lineTo(w, h);
   ctx.closePath();
@@ -235,54 +175,40 @@ function drawBackground(
   ctx.beginPath();
   ctx.moveTo(0, h);
   for (let xi = 0; xi <= w; xi += 6) {
-    ctx.lineTo(
-      xi,
-      h * 0.72 - Math.sin(xi * 0.018) * 22 - Math.sin(xi * 0.05 + 1) * 9
-    );
+    ctx.lineTo(xi, h * 0.72 - Math.sin(xi * 0.018) * 22 - Math.sin(xi * 0.05 + 1) * 9);
   }
   ctx.lineTo(w, h);
   ctx.closePath();
   ctx.fill();
-
 
   // 꽃
   const flowers = [
     { rx: 0.05, ry: 0.82, c: "#ff88aa" },
     { rx: 0.13, ry: 0.78, c: "#ffdd44" },
     { rx: 0.22, ry: 0.84, c: "#ff88aa" },
-    { rx: 0.31, ry: 0.8, c: "#aaddff" },
+    { rx: 0.31, ry: 0.8,  c: "#aaddff" },
     { rx: 0.48, ry: 0.88, c: "#ff88aa" },
-    { rx: 0.57, ry: 0.8, c: "#ffdd44" },
+    { rx: 0.57, ry: 0.8,  c: "#ffdd44" },
     { rx: 0.74, ry: 0.86, c: "#ff88aa" },
-    { rx: 0.9, ry: 0.83, c: "#aaddff" },
+    { rx: 0.9,  ry: 0.83, c: "#aaddff" },
   ];
-
   flowers.forEach(({ rx, ry, c }) => {
     const fx = rx * w;
     const fy = ry * h;
     const sw = Math.sin(frame * 0.04 + rx * 12) * 2;
-
     ctx.strokeStyle = "#3a7a10";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(fx, fy);
     ctx.lineTo(fx + sw, fy - 10);
     ctx.stroke();
-
     ctx.fillStyle = c;
     for (let i = 0; i < 5; i++) {
       const a = (i / 5) * Math.PI * 2;
       ctx.beginPath();
-      ctx.arc(
-        fx + sw + Math.cos(a) * 4,
-        fy - 10 + Math.sin(a) * 4,
-        3.5,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(fx + sw + Math.cos(a) * 4, fy - 10 + Math.sin(a) * 4, 3.5, 0, Math.PI * 2);
       ctx.fill();
     }
-
     ctx.fillStyle = "#ffff88";
     ctx.beginPath();
     ctx.arc(fx + sw, fy - 10, 2.5, 0, Math.PI * 2);
@@ -347,28 +273,24 @@ function drawPin(
 
 // ── 컴포넌트 ──
 export default function ProjectsScene() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const outerRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
+  const outerRef     = useRef<HTMLDivElement>(null);
+  const rafRef       = useRef<number>(0);
 
-  const [canvasSize, setCanvasSize] = useState({ w: 800, h: 420 });
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [canvasSize, setCanvasSize]     = useState({ w: 800, h: 420 });
+  const [activeId, setActiveId]         = useState<string | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState<{ left: string; top: string } | null>(null);
-  const [modalProject, setModalProject] = useState<Project | null>(null);
+  const [modalProject, setModalProject] = useState<(typeof PROJECTS)[0] | null>(null);
 
   const catRef = useRef({
-    x: 100,
-    y: 260,
-    tx: 100,
-    ty: 260,
+    x: 100, y: 260,
+    tx: 100, ty: 260,
     frame: 0,
     walking: false,
     facingLeft: false,
     pulse: 0,
-    clickX: -1,
-    clickY: -1,
-    clickPulse: 0,
+    clickX: -1, clickY: -1, clickPulse: 0,
   });
 
   // 캔버스 크기 반응형
@@ -412,13 +334,7 @@ export default function ProjectsScene() {
         ctx.save();
         ctx.globalAlpha = (s.clickPulse / 36) * 0.5;
         ctx.beginPath();
-        ctx.arc(
-          s.clickX,
-          s.clickY,
-          8 + (1 - s.clickPulse / 36) * 18,
-          0,
-          Math.PI * 2
-        );
+        ctx.arc(s.clickX, s.clickY, 8 + (1 - s.clickPulse / 36) * 18, 0, Math.PI * 2);
         ctx.strokeStyle = "#4682A9";
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -442,12 +358,13 @@ export default function ProjectsScene() {
       }
 
       s.x = Math.max(20, Math.min(w - 20, s.x));
-
-      // 산 위로는 못 올라가게 제한
       const mountainLimit = getMountainY(s.x, w, h) + 38;
       s.y = Math.max(mountainLimit, Math.min(h - 16, s.y));
 
-      drawPixelCat(ctx, s.x - 7 * S, s.y - 12 * S, s.frame, s.walking, s.facingLeft);
+      // 고양이 크기: CAT_PX * S 너비, CAT_PY * S 높이
+      const catW = CAT_PX * S;
+      const catH = CAT_PY * S;
+      drawPixelCat(ctx, s.x - catW / 2, s.y - catH, s.frame, s.walking, s.facingLeft);
 
       // 활성 카드 체크
       let found: string | null = null;
@@ -464,16 +381,14 @@ export default function ProjectsScene() {
         const proj = PROJECTS.find((p) => p.id === found);
         const cv = canvasRef.current;
         const ov = outerRef.current;
-
         if (proj && cv && ov) {
           const cr = cv.getBoundingClientRect();
           const or = ov.getBoundingClientRect();
           const scaleX = cr.width / w;
           const scaleY = cr.height / h;
-
           setTooltipStyle({
             left: `${cr.left - or.left + proj.rx * w * scaleX}px`,
-            top: `${cr.top - or.top + getMountainY(proj.rx * w, w, h) * scaleY - 8}px`,
+            top:  `${cr.top  - or.top  + getMountainY(proj.rx * w, w, h) * scaleY - 8}px`,
           });
         }
       } else {
@@ -531,64 +446,19 @@ export default function ProjectsScene() {
         </div>
 
         {activeProject && !modalProject && tooltipStyle && (
-          <div
-            className="tooltip-card"
-            key={activeProject.id}
+          <ProjectCard
+            project={activeProject}
             style={tooltipStyle}
-          >
-            <p className="tooltip-title">{activeProject.title}</p>
-            <p className="tooltip-desc">{activeProject.shortDesc}</p>
-            <button
-              className="tooltip-btn"
-              onClick={() => setModalProject(activeProject)}
-            >
-              자세히 보기 →
-            </button>
-          </div>
+            onDetail={() => setModalProject(activeProject)}
+          />
         )}
       </div>
 
       {modalProject && (
-        <div
-          className="modal-backdrop"
-          onClick={() => setModalProject(null)}
-        >
-          <div
-            className="modal-box"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              onClick={() => setModalProject(null)}
-            >
-              ✕
-            </button>
-            <div className="modal-icon">🐱</div>
-            <h3 className="modal-title">{modalProject.title}</h3>
-            <p className="modal-desc">{modalProject.fullDesc}</p>
-
-            {modalProject.tags.length > 0 && (
-              <div className="modal-tags">
-                {modalProject.tags.map((t) => (
-                  <span key={t} className="tag">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {modalProject.link && (
-              <a
-                className="modal-link"
-                href={modalProject.link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                GitHub에서 보기 →
-              </a>
-            )}
-          </div>
-        </div>
+        <ProjectModal
+          project={modalProject}
+          onClose={() => setModalProject(null)}
+        />
       )}
     </section>
   );

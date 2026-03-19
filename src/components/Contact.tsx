@@ -1,6 +1,6 @@
-import "./ContactNumber.css";
+import "./Contact.css";
 
-export default function ContactNumber() {
+export default function Contact() {
   return (
     <section id="contact" className="section contact-section">
       <div className="section-label">Contact</div>

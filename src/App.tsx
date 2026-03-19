@@ -3,7 +3,8 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import ProjectsScene from "./components/ProjectsScene";
-import ContactNumber from "./components/ContactNumber";
+import Contact from "./components/Contact";
+import Experience from "./components/Experience";
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
         <Hero />
         <About />
         <ProjectsScene />
-        <ContactNumber />
+        <Experience />
+        <Contact />
       </main>
     </div>
   );
